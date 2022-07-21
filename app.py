@@ -88,6 +88,7 @@ def register():
             return render_template("/register.html", username = "!!!", password = "Wrong", confirm = "confirmation !!!")
         hash1 = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)  # creates a password hash (encription)
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (name,hash1,))
+        db.commit()
         return redirect("/")
     else:
         return render_template("/register.html", username=username, password=password, confirm=confirm)
@@ -126,14 +127,17 @@ def trilingua():
     l2 = session['l2']  # get values from session
     l3 = session['l3']
     words=[]
+
     user_id = session.get("user_id")
     names = db.execute("SELECT username FROM users WHERE id = ?", (user_id,))
     for row in names:
         name = row[0]
 
     if request.method == 'POST':
+
         if request.form.get('btn') == 'clear': 
             db.execute("DELETE FROM words WHERE user_id = ?", (user_id,))
+            db.commit()
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name)
 
         if request.form.get('btnTest') == 'test':
@@ -148,8 +152,12 @@ def trilingua():
             if not request.form.get("middle"):
                 inp = request.form.get("right").lower()
                 right = inp
+                
                 if not request.form.get("right"):
-                    return render_template("trilingua.html", l1="NO", l2="INPUT", l3="DETECTED", name=name)
+                    wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
+                    for i in wordsAll:
+                        words.append(i)
+                    return render_template("trilingua.html", l1="NO", l2="INPUT", l3="DETECTED", name=name, words=words)
             else: 
                 inp = request.form.get("middle").lower()
                 middle = inp
@@ -175,10 +183,12 @@ def trilingua():
         check = db1.execute("SELECT translation FROM %s WHERE Word = ?" % (dict1), (inp,))
         row = check.fetchone()  # Check for empty cursor
         if row == None:
-            left, middle, right = 'No', 'such', 'word'
             db1.close()
-            db2.close()  
-            return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, middle=middle, left=left, right=right)
+            db2.close()
+            wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
+            for i in wordsAll:
+                words.append(i)  
+            return render_template("trilingua.html", l1="no", l2="such", l3="word", name=name, words=words)
         
         check = db2.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
         row = check.fetchone()  # Check for empty cursor [2]
@@ -208,11 +218,12 @@ def trilingua():
             middle = word2 
 
         # insert translations to DB:
-        check = db.execute("SELECT word1 FROM words WHERE user_id = ? AND word1 = ?", (user_id, left,))
+        check = db.execute("SELECT word1 FROM words WHERE user_id = ? AND word1 = ? AND word2 = ? AND word3 = ?", (user_id, left, middle, right,))
         row = check.fetchone()  # Check for empty cursor
         if row == None:
             db.execute("INSERT INTO words(user_id, word1, word2, word3) VALUES (?, ?, ?, ?)", (user_id, left, middle, right,))
-   
+            db.commit()
+
         wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
         for i in wordsAll:
             words.append(i)
