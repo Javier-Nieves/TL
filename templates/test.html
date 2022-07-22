@@ -76,9 +76,13 @@
         document.getElementById("method").onchange = Enable; // onchange - cool method
         function Enable() { // enable types selector if said method is choosen
             if (document.getElementById("Category").selected == true)
-            { document.getElementById("types").disabled = false}
-            else
-            {document.getElementById("types").disabled = true} // disables Types otherwise
+            { 
+                document.getElementById("types").disabled = false
+            }
+            else  // disables Types otherwise
+            {
+                document.getElementById("types").disabled = true
+            } 
         };
 
         function change_css(){

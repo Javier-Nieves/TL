@@ -21,19 +21,19 @@
 
     <body id="Page2">
 
+        <a class="nav-link-ind" href="/register">Register</a>
+
         <main class="main1" style="margin-top: 120px;">
             <h1 id="welcome">Get Started</h1>
         </main>
 
         <form action="/login" method="post">
             <div class="parent2" style="margin-top: 0px; margin-bottom: 40px;">
-                <input class="w3" autocomplete="off" autofocus id="username" name="username" placeholder="{{username}}" type="text" maxlength="50">
-                <input class="w3" id="password" name="password" placeholder="{{password}}" type="password" maxlength="50">
+                <input class="w3" autocomplete="off" autofocus id="username" name="username" placeholder="{{username}}" type="text" maxlength="50" required>
+                <input class="w3" id="password" name="password" placeholder="{{password}}" type="password" maxlength="50" required >
             </div>
             <div class="container" style="margin-top: 30px;">
                 <button class="btn btn-primary" type="submit">Log In</button> 
-                <h4 style="color: white;">Or</h4>
-                <button name="register" class="btn btn-primary" type="submit" value="register">Register</button>
             </div>
         </form>
         

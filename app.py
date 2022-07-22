@@ -39,16 +39,9 @@ def login():
 
         if request.form.get('register') == 'register':
             return redirect("/register")
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return render_template("login.html", username="Must provide username")
-
-        # Ensure password was submitted
-        elif not request.form.get("password"):
-            return render_template("login.html", username="must provide password")
 
         # Query database for username
-        one = "trijsdkj3"
+        one = "RandomHashPlaceholder"
         user = request.form.get("username").lower()
         rows = db.execute("SELECT * FROM users WHERE username = ?", (user,))
         for row in rows:
@@ -57,7 +50,7 @@ def login():
 
         # Ensure username exists and password is correct  
         passw = request.form.get("password")
-        if rows == []or not check_password_hash(one, passw):
+        if not check_password_hash(one, passw):
             return render_template("login.html", username="Invalid username", password="or password")
 
         # Remember which user has logged in
@@ -80,8 +73,6 @@ def register():
         if request.form.get('login') == 'login':
             return redirect("/login")
         name = request.form.get("username").lower()
-        if not name:
-            return render_template("/register.html", username = "Username", password = "needed", confirm = "!!!")
         names = db.execute("SELECT username FROM users WHERE username = ?", (name,))  # check db for username
         for row in names:
             if name == row[0]:  # check if name is already in DB
@@ -89,8 +80,6 @@ def register():
 
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
-        if not password or not confirmation:
-            return render_template("/register.html", username = "Enter", password = "password and", confirm = "confirmation")
         if password != confirmation:
             return render_template("/register.html", username = "!!!", password = "Wrong", confirm = "confirmation !!!")
         hash1 = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)  # creates a password hash (encription)
@@ -119,9 +108,9 @@ def index():
 
         if l1 == l2 or l1 == l3 or l2 == l3:
             return render_template("index.html", name=name, your="DIFFERENT")
-        if request.form.get('btn0') == 'TL': 
+        if request.form.get('translate') == 'translate': 
             return redirect('/trilingua')
-        if request.form.get('btn1') == 'test': 
+        if request.form.get('test') == 'test': 
             return redirect('/test')
     else:
         return render_template("index.html", name=name, your="your")
@@ -181,7 +170,7 @@ def trilingua():
             dict2 = l2 + l3
         else:
             dict1 = l3 + l1
-            dict2 = l3 + l2 
+            dict2 = l3 + l2
 
         # check input word
         db1 = sqlite3.connect("Dicts/" + dict1 + ".db", check_same_thread=False)
@@ -202,7 +191,7 @@ def trilingua():
         if row == None:
             left, middle, right = 'No', 'such', 'word' 
             db1.close()
-            db2.close()   
+            db2.close()
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, middle=middle, left=left, right=right)
 
         # get translations
@@ -222,7 +211,7 @@ def trilingua():
             right = word2
         else:
             left = word1
-            middle = word2 
+            middle = word2
 
         # insert translations to DB:
         check = db.execute("SELECT word1 FROM words WHERE user_id = ? AND word1 = ? AND word2 = ? AND word3 = ?", (user_id, left, middle, right,))
@@ -245,8 +234,8 @@ def trilingua():
         return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, words=words, name=name)
 
 
-@app.route("/test", methods=["GET", "POST"])  
-@login_required     
+@app.route("/test", methods=["GET", "POST"])
+@login_required
 def test():
     user_id = session.get("user_id")
     names = db.execute("SELECT username FROM users WHERE id = ?", (user_id,))
@@ -273,7 +262,7 @@ def test():
         db1 = sqlite3.connect("Dicts/" + dict1 + ".db", check_same_thread=False)
         db2 = sqlite3.connect("Dicts/" + dict2 + ".db", check_same_thread=False)
             
-        # choose Test method  
+        # choose Test method
         if request.form.get('method') == 'Random':
             # -=RANDOM=- :
             for j in range(number):
@@ -327,7 +316,7 @@ def test():
                     # select random word with selected type
                 le1 = db1.execute("SELECT word FROM %s WHERE type = ? ORDER BY RANDOM()" % (dict1), (type0,))
                 for j in le1:
-                    le = j[0]    
+                    le = j[0]
                     # find translations
                 mid1 = db1.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
                 for j in mid1:
@@ -355,7 +344,3 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
-
-
-if __name__ == "__main__":  # to start the app
-    app.run(debug=True)

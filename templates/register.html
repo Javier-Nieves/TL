@@ -20,21 +20,21 @@
 
     <body id="Page2">
 
+        <a class="nav-link-ind" href="/login">Login</a>
+
         <main class="main1" style="margin-top: 120px;">
             <h1 id="welcome">Register</h1>
         </main>
 
         <form action="/register" method="post">
             <div class="parent-reg" style="margin-bottom: 20px;">
-                <input class="w3" style="width: 300px; margin-top: 0;" name="username" placeholder="{{username}}" type="text" maxlength="50" onclick="ClearFields();">
-                <input class="w3" style="width: 300px;" name="password" placeholder="{{password}}" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." onclick="ClearFields();">
-                <input class="w3" style="width: 300px;" name="confirmation" placeholder="{{confirm}}" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." onclick="ClearFields();">
+                <input class="w3" style="width: 300px; margin-top: 0;" name="username" placeholder="{{username}}" type="text" maxlength="50" required>
+                <input class="w3" style="width: 300px;" name="password" placeholder="{{password}}" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." onclick="ClearFields();" required>
+                <input class="w3" style="width: 300px;" name="confirmation" placeholder="{{confirm}}" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." onclick="ClearFields();" required>
 
             </div>
             <div class="container">
                 <button class="btn btn-primary" type="submit">Register</button>
-                <h4 style="color: white;">Or</h4>
-                <button name="login" class="btn btn-primary" type="submit" value="login">Login</button>
             </div>
         </form>
      
@@ -42,14 +42,6 @@
             <footer id="footer">
                 <h4 style="color: white"><a href="https://javier-nieves.github.io/index.html">Konstantin Nikolskiy, 2022</a></h4>
             </footer>
-
-            <script>
-                function ClearFields() {
-                   document.getElementById("middle").value = "";
-                   document.getElementById("left").value = "";
-                   document.getElementById("right").value = "";
-               }
-       </script>
 
     </body>
 </html>

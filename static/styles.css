@@ -43,7 +43,6 @@ a:hover { /* main page top links */
     color:rgb(170, 192, 72);
   }
 
-
   .parent-reg { /* three main lang fields */
     display: flex; 
     justify-content: center;
@@ -55,7 +54,7 @@ a:hover { /* main page top links */
 
                 /* -------index page------- */
 #Page2 {
-    background-image: url("back0.jpeg");
+    background-image: url("IndexBack.jpeg");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
@@ -196,7 +195,7 @@ main {
 
                   /* --------TRILINGUA page------- */
 #TLPage {
-    background-image: url("back01.jpg");
+    background-image: url("TLBack.jpg");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
@@ -290,7 +289,7 @@ tbody tr:nth-of-type(odd) {
 }
                     /* -------TEST page------- */
 #PageTest {
-    background-image: url("08.jpeg");
+    background-image: url("TestBack.jpeg");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
