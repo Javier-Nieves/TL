@@ -2,6 +2,7 @@ footer {
     position: relative; 
     left: 42%;
     bottom: 0;
+    color: white;
 }
 
 .nav-list {
@@ -53,7 +54,7 @@ a:hover { /* main page top links */
 }
 
                 /* -------index page------- */
-#Page2 {
+.Page2 {
     background-image: url("IndexBack.jpeg");
     background-repeat: no-repeat;
     background-attachment: fixed;
