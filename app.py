@@ -2,9 +2,16 @@ import sqlite3
 from flask import Flask, request, redirect, render_template
 from flask import session
 from flask_session import Session
-from helpers import login_required
 from werkzeug.security import check_password_hash, generate_password_hash
+from functools import wraps
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Configure application
 app = Flask(__name__)
