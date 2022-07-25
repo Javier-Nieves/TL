@@ -275,6 +275,8 @@ main {
     padding: 15px 30px 15px 30px;
     margin-top: 20px;
     font-size: 20px;
+    min-width: 10%;
+    max-width: 100%;
 }
 .w3:focus { outline-color: rgb(170, 192, 72);}
 
@@ -363,7 +365,6 @@ tbody tr:nth-of-type(odd) {
 }
 
 .test {
-    width: 350px;
     background-color: rgba(255, 255, 255, 0.9);
     border-style: none;
 }
