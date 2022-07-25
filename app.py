@@ -15,7 +15,7 @@ def login_required(f):
 
 # Configure application
 app = Flask(__name__)
-app.secret_key = 'Kin3101513'
+app.secret_key = 'Kin3101513'  # Привет, Костик! пока хз куда лучше деть этот ключ..
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -35,20 +35,12 @@ def login():
         new = session['new-user']
     except:
         new = 0 
-
     if new == 1:
         session['new-user'] = 0
-        return render_template("login.html", new=new)
-
+        return render_template("login.html", new=new, warningCode="You have been registered succesfully!")
     session.clear()
-    username = "Username"
-    password = "Password"
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-
-        if request.form.get('register') == 'register':
-            return redirect("/register")
-
         # Query database for username
         one = "RandomHashPlaceholder"
         user = request.form.get("username").lower()
@@ -56,46 +48,37 @@ def login():
         for row in rows:
             uid = row[0]  # ID
             one = row[2]  # hash
-# rows.fetchall()
         # Ensure username exists and password is correct  
         passw = request.form.get("password")
         if not check_password_hash(one, passw):
-            return render_template("login.html", username="Invalid username", password="or password")
-
+            return render_template("login.html", warningCode="Wrong name or password")
         # Remember which user has logged in
         session["user_id"] = uid
-        # Redirect user to home page
         return redirect("/")
     # GET
     else:
-        return render_template("login.html", username=username, password=password, new=1)
+        return render_template("login.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    username = "Username"
-    password = "Password"
-    confirm = "Confirm password"
     if request.method == "POST":
-        if request.form.get('login') == 'login':
-            return redirect("/login")
         name = request.form.get("username").lower()
         names = db.execute("SELECT username FROM users WHERE username = ?", (name,))  # check db for username
-        for row in names:
-            if name == row[0]:  # check if name is already in DB
-                return render_template("/register.html", username = "User", password = "already", confirm = "exists")
-
+        data = names.fetchone()
+        if data != None:
+            return render_template("/register.html", warningCode="User already exists")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
         if password != confirmation:
-            return render_template("/register.html", username = "!!!", password = "Wrong", confirm = "confirmation !!!")
+            return render_template("/register.html", warningCode="Wrong confirmation")
         hash1 = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)  # creates a password hash (encription)
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (name,hash1,))
         db.commit()
         session["new-user"] = 1
         return redirect("/login")
     else:
-        return render_template("/register.html", username=username, password=password, confirm=confirm)
+        return render_template("/register.html")
 
 
 @app.route("/", methods=["GET", "POST"]) 
@@ -103,9 +86,7 @@ def register():
 def index():
     user_id = session.get("user_id")
     names = db.execute("SELECT username FROM users WHERE id = ?", (user_id,))
-    for row in names:
-        name = row[0] # user name
-
+    name = names.fetchone()[0]  # user name
     if request.method == 'POST':  # languages are choosen 
         l1 = request.form['options1']
         l2 = request.form['options2']  # get value from radio buttons
@@ -113,7 +94,6 @@ def index():
         session['l1'] = l1  
         session['l2'] = l2  # a way to send info via session !
         session['l3'] = l3
-
         if l1 == l2 or l1 == l3 or l2 == l3:
             return render_template("index.html", name=name, your="DIFFERENT")
         if request.form.get('translate') == 'translate': 
@@ -133,19 +113,12 @@ def trilingua():
     words=[]
     user_id = session.get("user_id")
     names = db.execute("SELECT username FROM users WHERE id = ?", (user_id,))
-    for row in names:
-        name = row[0]
-
+    name = names.fetchone()[0]  # user name
     if request.method == 'POST':
         if request.form.get('btn') == 'clear': 
             db.execute("DELETE FROM words WHERE user_id = ?", (user_id,))
             db.commit()
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name)
-
-        if request.form.get('btnTest') == 'test':
-            return redirect('/test')
-        if request.form.get('btnInd') == 'ind':
-            return redirect('/')
 
         left, middle, right = 100, 200, 300  # rand values for forms
         # determine which form was filled
@@ -164,7 +137,6 @@ def trilingua():
         else:
             inp = request.form.get("left").lower()
             left = inp
-
         # choose dicts:
         if left == inp:
             dict1 = l1 + l2
@@ -175,7 +147,6 @@ def trilingua():
         else:
             dict1 = l3 + l1
             dict2 = l3 + l2
-
         # check input word
         db1 = sqlite3.connect("Dicts/" + dict1 + ".db", check_same_thread=False)
         db2 = sqlite3.connect("Dicts/" + dict2 + ".db", check_same_thread=False)
@@ -189,23 +160,21 @@ def trilingua():
             for i in wordsAll:
                 words.append(i)  
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name, words=words, warningCode="No such word")
-        
         check = db2.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
-        row = check.fetchone()  # Check for empty cursor [2]
+        row = check.fetchone()  # Check for empty cursor
         if row == None:
-            left, middle, right = 'No', 'such', 'word' 
             db1.close()
             db2.close()
-            return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, middle=middle, left=left, right=right)
+            wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
+            for i in wordsAll:
+                words.append(i)  
+            return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name, words=words, warningCode="No such word")
 
         # get translations
         word11 = db1.execute("SELECT translation FROM %s WHERE Word = ?" % (dict1), (inp,))
-        for row in word11:
-            word1 = row[0]
+        word1 = word11.fetchone()[0]
         word22 = db2.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
-        for row in word22:
-            word2 = row[0]
-
+        word2 = word22.fetchone()[0]
         # output translations
         if left == inp:
             middle = word1
@@ -216,7 +185,6 @@ def trilingua():
         else:
             left = word1
             middle = word2
-
         # insert translations to DB:
         check = db.execute("SELECT word1 FROM words WHERE user_id = ? AND word1 = ? AND word2 = ? AND word3 = ?", (user_id, left, middle, right,))
         row = check.fetchone()  # Check for empty cursor
@@ -227,7 +195,6 @@ def trilingua():
         wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
         for i in wordsAll:
             words.append(i)
-        
         db1.close()
         db2.close()
         return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, middle=middle, left=left, right=right, words=words, name=name)
@@ -243,9 +210,7 @@ def trilingua():
 def test():
     user_id = session.get("user_id")
     names = db.execute("SELECT username FROM users WHERE id = ?", (user_id,))
-    for row in names:
-        name = row[0]
-
+    name = names.fetchone()[0]
     l1 = session['l1']
     l2 = session['l2']  # get values from session
     l3 = session['l3']
@@ -265,22 +230,18 @@ def test():
         # connect to needed dicts
         db1 = sqlite3.connect("Dicts/" + dict1 + ".db", check_same_thread=False)
         db2 = sqlite3.connect("Dicts/" + dict2 + ".db", check_same_thread=False)
-            
         # choose Test method
         if request.form.get('method') == 'Random':
             # -=RANDOM=- :
             for j in range(number):
                     # select random word
                 le1 = db1.execute("SELECT word FROM %s ORDER BY RANDOM()" % (dict1))
-                for row in le1:
-                    le = row[0]
+                le = le1.fetchone()[0]
                     # find translations
                 mid1 = db1.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
-                for row in mid1:
-                    mid = row[0]
+                mid = mid1.fetchone()[0]
                 ri1 = db2.execute("SELECT translation FROM %s WHERE word = ?" % (dict2), (le,))
-                for row in ri1:
-                    ri = row[0]
+                ri = ri1.fetchone()[0]
                     # add to lists
                 left.append(le)
                 middle.append(mid)
@@ -299,15 +260,12 @@ def test():
             for j in range(number):
                     # select random word from personal dict
                 le1 = db.execute("SELECT word1 FROM words WHERE user_id = ? ORDER BY RANDOM()", (user_id,))
-                for j in le1:
-                    le = j[0]
+                le = le1.fetchone()[0]
                     # ..and it's translations
                 mid1 = db.execute("SELECT word2 FROM words WHERE word1 = ?", (le,))
-                for j in mid1:
-                    mid = j[0]
+                mid = mid1.fetchone()[0]
                 ri1 = db.execute("SELECT word3 FROM words WHERE word1 = ?", (le,))
-                for j in ri1:
-                    ri = j[0]
+                ri = ri1.fetchone()[0]
                 # add to lists
                 left.append(le)
                 middle.append(mid)
@@ -321,15 +279,12 @@ def test():
             for j in range(number):
                     # select random word with selected type
                 le1 = db1.execute("SELECT word FROM %s WHERE type = ? ORDER BY RANDOM()" % (dict1), (type0,))
-                for j in le1:
-                    le = j[0]
+                le = le1.fetchone()[0]
                     # find translations
                 mid1 = db1.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
-                for j in mid1:
-                    mid = j[0]
+                mid = mid1.fetchone()[0]
                 ri1 = db2.execute("SELECT translation FROM %s WHERE word = ?" % (dict2), (le,))
-                for j in ri1:
-                    ri = j[0]
+                ri = ri1.fetchone()[0]
                     # add to lists
                 left.append(le)
                 middle.append(mid)

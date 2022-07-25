@@ -39,7 +39,6 @@ footer {
     color:rgba(170, 192, 72; */
   }
   
-
 a:hover { /* main page top links */
     text-decoration: none;
     color:rgb(170, 192, 72);
@@ -396,6 +395,10 @@ tbody tr:nth-of-type(odd) {
 
   .mid {
     color: rgba(0, 0, 0, 0.0);
+}
+
+.mid-vis {
+    color: rgb(248, 77, 25);
 }
 
 .mid:focus, .mid:hover {

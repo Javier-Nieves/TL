@@ -6,20 +6,35 @@ Welcome to Trilingua!
 
 {% block main %}
     <body class="Page2">
-
+        <input type="hidden" id="warningReg" value="{{warningCode}}">
         <a class="nav-link-ind" href="/login">Login</a>
         <h1  class="main1" id="welcome">Register</h1>
+        <div class="container-alert">
+            <div id="Reg-alert" class="alert-TL">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>Warning!</strong> {{warningCode}}
+            </div>
+        </div>
         <form action="/register" method="post">
             <div class="parent-reg">
-                <input class="w3" name="username" placeholder="{{username}}" type="text" maxlength="50" required>
-                <input class="w3" name="password" placeholder="{{password}}" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." required>
-                <input class="w3" name="confirmation" placeholder="{{confirm}}" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." required>
+                <input class="w3" name="username" placeholder="Username" type="text" maxlength="50" required>
+                <input class="w3" name="password" placeholder="Password" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." required>
+                <input class="w3" name="confirmation" placeholder="Confirm password" type="password" maxlength="50" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number." required>
             </div>
             <div class="container">
                 <button class="btn btn-primary" type="submit">Register</button>
             </div>
         </form>
-
+    <script>
+    if (document.getElementById("warningReg").value)
+    {
+        document.getElementById("Reg-alert").className = "alert-TL";
+    }
+    else
+    {
+        document.getElementById("Reg-alert").className = "alert-invis";
+    }
+    </script>
 {% endblock %}
 
 

@@ -1,38 +1,43 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Welcome to Trilingua! {{new}}
+Welcome to Trilingua!
 {% endblock %}
 
 {% block main %}
     <body class="Page2">
-        <input type="hidden" id="new-user" value="{{new}}">
+        <input type="hidden" id="new-user" value="{{warningCode}}">
         <a class="nav-link-ind" href="/register">Register</a>
         <h1 class="main1" id="welcome">Get Started</h1>
         
         <div class="container-alert">
             <div id="register-alert" class="alert-invis">
             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-            <strong>Welcome!</strong> You have been registered succesfully!
+            <strong>Welcome!</strong> {{warningCode}}
             </div>
         </div>
         <form action="/login" method="post">
             <div class="parent2">
-                <input class="w3" autocomplete="off" autofocus id="username" name="username" placeholder="{{username}}" type="text" maxlength="50" required>
-                <input class="w3" id="password" name="password" placeholder="{{password}}" type="password" maxlength="50" required >
+                <input class="w3" autocomplete="off" autofocus id="username" name="username" placeholder="username" type="text" maxlength="50" required>
+                <input class="w3" id="password" name="password" placeholder="password" type="password" maxlength="50" required >
             </div>
             <div class="container">
                 <button class="btn btn-primary" type="submit">Log In</button> 
             </div>
         </form>
-        <script>
-            if (document.getElementById("new-user").value == 1)
+        <script> 
+        var field = document.getElementById("new-user").value
+            if (field == "You have been registered succesfully!")
             {
                 document.getElementById("register-alert").className = "alert-vis";
+            }
+            else if (field && field != 1 )
+            {
+                document.getElementById("register-alert").className = "alert-TL";
             }
             else
             {
                 document.getElementById("register-alert").className = "alert-invis";
             }
-        </script>
+        </script> 
 {% endblock %}
