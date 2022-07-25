@@ -6,7 +6,7 @@ Trilingua Test
 
 {% block main %}
     <body id="PageTest">
-
+        <input type="hidden" id="warningTest" value="{{warningCode}}">
         <nav> 
             <ul class="nav-list">
                 <li class="fl"><a class="Tlink" href="/">-Languages-</a></li>
@@ -35,20 +35,25 @@ Trilingua Test
             <button id="refresh" class="btn-22" onClick="window.location.reload();">&#8634</button>
             <button id="reveal" class="btn-22" onclick="change_css()">Reveal</button>      
         </div>
-
+        <div class="container-alert">
+            <div id="Test-alert" class="alert-TL">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>Warning!</strong> {{warningCode}}
+            </div>
+        </div>
         {% for i in range(left|length) %} <!-- (!) jinja lenght -->
 
         <div class="container3">
             <form class="w3-row-padding">
                 <div class="w3-third">
-                    <input id='left' name="left" class="w3 test" readonly type="text" placeholder="{{l1}}" value="{{left[i]}}">
+                    <input id='left' name="left" class="w3 test" readonly type="text" value="{{left[i]}}">
                 </div>
                 <div class="w3-third">
-                    <input id='middle' name="middle" class="w3 test mid" readonly type="text" placeholder="{{l2}}" value="{{middle[i]}}">
+                    <input id='middle' name="middle" class="w3 test mid" readonly type="text" value="{{middle[i]}}">
                     <input type="submit" hidden>
                 </div>
                 <div class="w3-third">
-                    <input id='right' name="right" class="w3 test mid" readonly type="text" placeholder="{{l3}}" value="{{right[i]}}">
+                    <input id='right' name="right" class="w3 test mid" readonly type="text" value="{{right[i]}}">
                 </div>
             </form>
         </div>
@@ -71,6 +76,15 @@ Trilingua Test
             for(var i = 0, length = elements.length; i < length; i++) {
                 elements[i].style.cssText = 'color:rgb(248, 77, 25);';
             }
+        }
+        // warning checks
+        if (document.getElementById("warningTest").value)
+        {
+            document.getElementById("Test-alert").className = "alert-TL";
+        }
+        else
+        {
+            document.getElementById("Test-alert").className = "alert-invis";
         }
     </script>
 {% endblock %}

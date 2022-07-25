@@ -6,6 +6,7 @@ Trilingua
 
 {% block main %}
     <body id="TLPage">
+        <input type="hidden" id="warning" value="{{warningCode}}">
         <nav> 
             <ul class="nav-list">
                 <li class="fl"><a href="/">-Languages-</a></li>
@@ -13,8 +14,14 @@ Trilingua
             </ul>
         </nav>
         <h1 class="main2"><a href="/trilingua"> Trilingua</a></h1> 
+        <div class="container-alert">
+            <div id="TL-alert" class="alert-TL">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>Warning!</strong> {{warningCode}}
+            </div>
+        </div>
         <a class="nav-link-TL" href="/logout">{{name}} - Logout</a>
-        <form action="/trilingua" method="post">
+        <form id="TL-form" action="/trilingua" method="post">
             <div class="parent2">
                 <input id='left' name="left" class="w3" type="text" placeholder="{{l1}}" onclick="ClearFields();" value="{{left}}" maxlength="50">
                 <input id='middle' name="middle" class="w3" type="text" placeholder="{{l2}}" onclick="ClearFields();" value="{{middle}}" maxlength="50">
@@ -46,6 +53,15 @@ Trilingua
                 document.getElementById("middle").value = "";
                 document.getElementById("left").value = "";
                 document.getElementById("right").value = "";
+            }
+            // warning checks
+            if (document.getElementById("warning").value)
+            {
+                document.getElementById("TL-alert").className = "alert-TL";
+            }
+            else
+            {
+                document.getElementById("TL-alert").className = "alert-invis";
             }
         </script>
 {% endblock %}

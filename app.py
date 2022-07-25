@@ -27,9 +27,18 @@ Session(app)
 
 db = sqlite3.connect('users.db', check_same_thread=False)
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     # Forget any user_id
+    try:
+        new = session['new-user']
+    except:
+        new = 0 
+
+    if new == 1:
+        session['new-user'] = 0
+        return render_template("login.html", new=new)
 
     session.clear()
     username = "Username"
@@ -47,7 +56,7 @@ def login():
         for row in rows:
             uid = row[0]  # ID
             one = row[2]  # hash
-
+# rows.fetchall()
         # Ensure username exists and password is correct  
         passw = request.form.get("password")
         if not check_password_hash(one, passw):
@@ -55,13 +64,11 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = uid
-
         # Redirect user to home page
         return redirect("/")
-
-    # User reached route via GET
+    # GET
     else:
-        return render_template("login.html", username=username, password=password)
+        return render_template("login.html", username=username, password=password, new=1)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -85,7 +92,8 @@ def register():
         hash1 = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)  # creates a password hash (encription)
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (name,hash1,))
         db.commit()
-        return redirect("/")
+        session["new-user"] = 1
+        return redirect("/login")
     else:
         return render_template("/register.html", username=username, password=password, confirm=confirm)
 
@@ -123,14 +131,12 @@ def trilingua():
     l2 = session['l2']  # get values from session
     l3 = session['l3']
     words=[]
-
     user_id = session.get("user_id")
     names = db.execute("SELECT username FROM users WHERE id = ?", (user_id,))
     for row in names:
         name = row[0]
 
     if request.method == 'POST':
-
         if request.form.get('btn') == 'clear': 
             db.execute("DELETE FROM words WHERE user_id = ?", (user_id,))
             db.commit()
@@ -138,7 +144,6 @@ def trilingua():
 
         if request.form.get('btnTest') == 'test':
             return redirect('/test')
-
         if request.form.get('btnInd') == 'ind':
             return redirect('/')
 
@@ -148,12 +153,11 @@ def trilingua():
             if not request.form.get("middle"):
                 inp = request.form.get("right").lower()
                 right = inp
-                
                 if not request.form.get("right"):
                     wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
                     for i in wordsAll:
                         words.append(i)
-                    return render_template("trilingua.html", l1="NO", l2="INPUT", l3="DETECTED", name=name, words=words)
+                    return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name, words=words, warningCode="No input detected")
             else: 
                 inp = request.form.get("middle").lower()
                 middle = inp
@@ -184,7 +188,7 @@ def trilingua():
             wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
             for i in wordsAll:
                 words.append(i)  
-            return render_template("trilingua.html", l1="no", l2="such", l3="word", name=name, words=words)
+            return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name, words=words, warningCode="No such word")
         
         check = db2.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
         row = check.fetchone()  # Check for empty cursor [2]
@@ -290,7 +294,7 @@ def test():
             if row == None:
                 db1.close()
                 db2.close()
-                return render_template("test.html", l1=l1, l2=l2, l3=l3, name=name, left=["No words"], middle=["in personal"], right=["dictionary :("], methods=methods, types=types)
+                return render_template("test.html", name=name, methods=methods, types=types, warningCode="No words in personal dictionary")
             
             for j in range(number):
                     # select random word from personal dict
@@ -312,6 +316,8 @@ def test():
         elif request.form.get('method') == 'Category':
             # TYPES:
             type0 = request.form.get('type')  # selected type
+            if not type0:
+                return render_template("test.html", name=name, methods=methods, types=types, warningCode="Please choose category")
             for j in range(number):
                     # select random word with selected type
                 le1 = db1.execute("SELECT word FROM %s WHERE type = ? ORDER BY RANDOM()" % (dict1), (type0,))
@@ -331,9 +337,9 @@ def test():
 
         db1.close()
         db2.close()
-        return render_template("test.html", l1=l1, l2=l2, l3=l3, name=name, left=left, middle=middle, right=right, methods=methods, types=types)
+        return render_template("test.html", name=name, left=left, middle=middle, right=right, methods=methods, types=types)
     else:  # GET
-        return render_template("test.html", l1=l1, l2=l2, l3=l3, name=name, methods=methods, types=types)
+        return render_template("test.html", name=name, methods=methods, types=types)
 
 
 @app.route("/logout")

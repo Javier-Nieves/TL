@@ -1,14 +1,21 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Welcome to Trilingua!
+Welcome to Trilingua! {{new}}
 {% endblock %}
 
 {% block main %}
     <body class="Page2">
-
+        <input type="hidden" id="new-user" value="{{new}}">
         <a class="nav-link-ind" href="/register">Register</a>
         <h1 class="main1" id="welcome">Get Started</h1>
+        
+        <div class="container-alert">
+            <div id="register-alert" class="alert-invis">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>Welcome!</strong> You have been registered succesfully!
+            </div>
+        </div>
         <form action="/login" method="post">
             <div class="parent2">
                 <input class="w3" autocomplete="off" autofocus id="username" name="username" placeholder="{{username}}" type="text" maxlength="50" required>
@@ -18,4 +25,14 @@ Welcome to Trilingua!
                 <button class="btn btn-primary" type="submit">Log In</button> 
             </div>
         </form>
+        <script>
+            if (document.getElementById("new-user").value == 1)
+            {
+                document.getElementById("register-alert").className = "alert-vis";
+            }
+            else
+            {
+                document.getElementById("register-alert").className = "alert-invis";
+            }
+        </script>
 {% endblock %}

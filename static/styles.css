@@ -1,5 +1,6 @@
+
 footer {
-    position: relative; 
+    position: fixed; 
     left: 42%;
     bottom: 0;
     color: white;
@@ -53,6 +54,39 @@ a:hover { /* main page top links */
     min-width: 600px;
 }
 
+                /* -------login-------- */
+.container-alert {
+    display: flex; 
+    justify-content: center;
+
+}
+
+.alert-vis {
+    text-align: center;
+    background-color: rgba(2, 196, 44, 0.6);
+    width: 70%;
+    padding: 10px 0 10px 0;
+    color: white;
+}
+.alert-invis {
+    opacity: 0.0;
+}
+    
+.closebtn {
+    margin-right: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+    
+.closebtn:hover {
+    color: black;
+}
+
                 /* -------index page------- */
 .Page2 {
     background-image: url("IndexBack.jpeg");
@@ -100,7 +134,6 @@ main {
     border-radius: 10px;
     padding: 0 15px 0 15px;
 }
-
 /* check boxes */
 .rad-label {
     display: flex;
@@ -211,7 +244,13 @@ main {
     font-size: 130px;
     font-family: 'Snell Roundhand', cursive
 }
-
+.alert-TL {
+    text-align: center;
+    background-color: rgba(228, 191, 3, 0.6);
+    width: 70%;
+    padding: 10px 0 10px 0;
+    color: black;
+}
 .nav-link-TL {
     position: fixed;
     top: 2%;
@@ -219,6 +258,10 @@ main {
     color: black; }
 
 .nav-link-TL:hover {color:rgb(170, 192, 72);}
+
+#TL-form {
+    padding-bottom: 100px;
+}
 
 .parent2 { /* three main lang fields */
     display: flex; 
