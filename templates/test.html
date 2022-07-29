@@ -71,10 +71,12 @@ Trilingua Test
                 document.getElementById("types").disabled = true
             } 
         };
+        
         function change_css(){
             var elements = document.getElementsByClassName('mid');
-            for(var i = 0, length = elements.length; i < length; i++) {
-                elements[i].style.className = "mid-vis";  // all fields of class "mid" (with translations)
+            for (var i = 0, length = elements.length; i < length; i++) {
+                elements[i].classList.toggle("midVis");  // all fields of class "mid" (with translations)
+                //elements[i].style.width = "50px";
             }
         }
         // warning checks

@@ -27,7 +27,6 @@ Session(app)
 
 db = sqlite3.connect('users.db', check_same_thread=False)
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     # Forget any user_id
@@ -119,7 +118,6 @@ def trilingua():
             db.execute("DELETE FROM words WHERE user_id = ?", (user_id,))
             db.commit()
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name)
-
         left, middle, right = 100, 200, 300  # rand values for forms
         # determine which form was filled
         if not request.form.get("left"):
@@ -148,32 +146,24 @@ def trilingua():
             dict1 = l3 + l1
             dict2 = l3 + l2
         # check input word
-        db1 = sqlite3.connect("Dicts/" + dict1 + ".db", check_same_thread=False)
-        db2 = sqlite3.connect("Dicts/" + dict2 + ".db", check_same_thread=False)
-        
-        check = db1.execute("SELECT translation FROM %s WHERE Word = ?" % (dict1), (inp,))
+        check = db.execute("SELECT translation FROM %s WHERE Word = ?" % (dict1), (inp,))
         row = check.fetchone()  # Check for empty cursor
         if row == None:
-            db1.close()
-            db2.close()
             wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
             for i in wordsAll:
                 words.append(i)  
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name, words=words, warningCode="No such word")
-        check = db2.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
+        check = db.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
         row = check.fetchone()  # Check for empty cursor
         if row == None:
-            db1.close()
-            db2.close()
             wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
             for i in wordsAll:
                 words.append(i)  
             return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, name=name, words=words, warningCode="No such word")
-
         # get translations
-        word11 = db1.execute("SELECT translation FROM %s WHERE Word = ?" % (dict1), (inp,))
+        word11 = db.execute("SELECT translation FROM %s WHERE Word = ?" % (dict1), (inp,))
         word1 = word11.fetchone()[0]
-        word22 = db2.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
+        word22 = db.execute("SELECT translation FROM %s WHERE Word = ?" % (dict2), (inp,))
         word2 = word22.fetchone()[0]
         # output translations
         if left == inp:
@@ -195,8 +185,6 @@ def trilingua():
         wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
         for i in wordsAll:
             words.append(i)
-        db1.close()
-        db2.close()
         return render_template("trilingua.html", l1=l1, l2=l2, l3=l3, middle=middle, left=left, right=right, words=words, name=name)
     else:
         wordsAll = db.execute("SELECT * FROM words WHERE user_id = ?", (user_id,))
@@ -217,7 +205,7 @@ def test():
     methods = ['Random', 'Personal', 'Category']
     types, left, middle, right = [], [], [], []
     # list all types in dict:
-    type1 = sqlite3.connect("Dicts/engrus.db").execute("SELECT DISTINCT type FROM engrus ORDER BY type")
+    type1 = db.execute("SELECT DISTINCT type FROM engrus ORDER BY type")
     for i in type1:
         types.append(i[0])
 
@@ -227,20 +215,17 @@ def test():
         # set lang order
         dict1 = l1 + l2
         dict2 = l1 + l3
-        # connect to needed dicts
-        db1 = sqlite3.connect("Dicts/" + dict1 + ".db", check_same_thread=False)
-        db2 = sqlite3.connect("Dicts/" + dict2 + ".db", check_same_thread=False)
         # choose Test method
         if request.form.get('method') == 'Random':
             # -=RANDOM=- :
             for j in range(number):
                     # select random word
-                le1 = db1.execute("SELECT word FROM %s ORDER BY RANDOM()" % (dict1))
+                le1 = db.execute("SELECT word FROM %s ORDER BY RANDOM()" % (dict1))
                 le = le1.fetchone()[0]
                     # find translations
-                mid1 = db1.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
+                mid1 = db.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
                 mid = mid1.fetchone()[0]
-                ri1 = db2.execute("SELECT translation FROM %s WHERE word = ?" % (dict2), (le,))
+                ri1 = db.execute("SELECT translation FROM %s WHERE word = ?" % (dict2), (le,))
                 ri = ri1.fetchone()[0]
                     # add to lists
                 left.append(le)
@@ -253,8 +238,6 @@ def test():
             check = db.execute("SELECT word1 FROM words WHERE user_id = ?", (user_id,))
             row = check.fetchone()  # Check for empty cursor
             if row == None:
-                db1.close()
-                db2.close()
                 return render_template("test.html", name=name, methods=methods, types=types, warningCode="No words in personal dictionary")
             
             for j in range(number):
@@ -278,20 +261,17 @@ def test():
                 return render_template("test.html", name=name, methods=methods, types=types, warningCode="Please choose category")
             for j in range(number):
                     # select random word with selected type
-                le1 = db1.execute("SELECT word FROM %s WHERE type = ? ORDER BY RANDOM()" % (dict1), (type0,))
+                le1 = db.execute("SELECT word FROM %s WHERE type = ? ORDER BY RANDOM()" % (dict1), (type0,))
                 le = le1.fetchone()[0]
                     # find translations
-                mid1 = db1.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
+                mid1 = db.execute("SELECT translation FROM %s WHERE word = ?" % (dict1), (le,))
                 mid = mid1.fetchone()[0]
-                ri1 = db2.execute("SELECT translation FROM %s WHERE word = ?" % (dict2), (le,))
+                ri1 = db.execute("SELECT translation FROM %s WHERE word = ?" % (dict2), (le,))
                 ri = ri1.fetchone()[0]
                     # add to lists
                 left.append(le)
                 middle.append(mid)
                 right.append(ri)
-
-        db1.close()
-        db2.close()
         return render_template("test.html", name=name, left=left, middle=middle, right=right, methods=methods, types=types)
     else:  # GET
         return render_template("test.html", name=name, methods=methods, types=types)
@@ -299,9 +279,7 @@ def test():
 
 @app.route("/logout")
 def logout():
-
     # Forget any user_ida
     session.clear()
-
     # Redirect user to login form
     return redirect("/")
